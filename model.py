@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+from train import Training
 
 ## Create Your Model (I give you a example) : 
 class Your_Model(nn.Module):
@@ -16,3 +16,7 @@ class Your_Model(nn.Module):
     )
   def forward(self, x):
     return self.model(x) 
+
+  def fit(self, dataloader, learning_rate: float, optimizer_type: str, criterion_type: str, epochs: int):
+        trainer = Training(self, learning_rate, optimizer_type, criterion_type, epochs)
+        trainer.train(dataloader)
