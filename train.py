@@ -52,7 +52,7 @@ class Training:
         else:
             raise ValueError(f"Unsupported criterion: {self.criterion_type}")
 
-    def train(self, train_loader):
+    def train(self, train_loader, val_loader):
         """
         Perform the training loop.
 
@@ -79,3 +79,41 @@ class Training:
 
             avg_loss = epoch_loss / len(train_loader)
             print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {avg_loss:.4f}")
+
+            # Evaluate on the validation set
+            val_loss, val_accuracy = self.evaluate(val_loader)
+            print(f"Validation Loss: {val_loss:.4f}, Validation Accuracy: {val_accuracy:.4f}")
+
+    def evaluate(self, val_loader: DataLoader) :
+        """
+        Evaluate the model on the validation set.
+
+        Args:
+            val_loader (torch.utils.data.DataLoader): DataLoader for validation data.
+
+        Returns:
+            float: Average validation loss.
+            float: Validation accuracy.
+        """
+        self.model.eval()
+        val_loss = 0.0
+        correct = 0
+        total = 0
+
+        with torch.no_grad() :
+            for inputs, labels in val_loader :
+                outputs = self.model(inputs)
+                loss = self.criterion(outputs, labels)
+                val_loss += loss.item()
+
+                # Calculate accuracy
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        avg_loss = val_loss / len(val_loader)
+        accuracy = correct / total
+        return avg_loss, accuracy
+
+
+        
